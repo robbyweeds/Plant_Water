@@ -1,9 +1,10 @@
 #include <arduino.h>
+#include <arduino.h>
 #include <WiFi.h>
 
 
-// Potentiometer is connected to GPIO 4
-const int potPin = 4;
+// Potentiometer is connected to GPIO 34
+const int potPin = 34;
 
 
 int pumpstate = 0;
@@ -28,7 +29,7 @@ String output27State;
 String header;
 
 // variable for storing the potentiometer value
-int potValue = 0;
+int potValue =0;
 
 // Pump Relay Pin
 int pumpRelayPin = 23;
@@ -68,8 +69,8 @@ void loop() {
   WiFiClient client = server.available();   // Listen for incoming clients
 
   //  Read Sensor
-    analogRead(potPin);
-    //Serial.println(potPin);
+    potValue = analogRead(potPin);
+    Serial.println("value: " + potValue);
 
 
   if (client) {                             // If a new client connects,
@@ -152,9 +153,9 @@ void loop() {
             
             // PUMP START and STOP
             if (pumpstate == 0) {
-                client.println("<p><a href=\"/pump/0\"><button class=\"button\">TURN PUMP ON</button></a></p>");
+                client.println("<p><a href=\"/pump/1\"><button class=\"button\">TURN PUMP ON</button></a></p>");
             } else {
-               client.println("<p><a href=\"/pump/1\"><button class=\"button button2\">TURN PUMP OFF</button></a></p>"); 
+               client.println("<p><a href=\"/pump/0\"><button class=\"button button2\">TURN PUMP OFF</button></a></p>"); 
             }
 
             // Set to Pump AUTO
@@ -201,5 +202,5 @@ void loop() {
     Serial.println("");
   }
 
-  delay(2000);
+  delay(500);
 }
