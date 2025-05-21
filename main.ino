@@ -10,8 +10,8 @@ int pumpstate = 0;
 int pumpAuto = 0;
 
 // Replace with your network credentials
-const char* ssid     = "ESP32-Access-Point";
-const char* password = "123456789";
+const String ssid     = "ESP32-Access-Point";
+const String password = "123456789";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -20,6 +20,9 @@ WiFiServer server(80);
 const int output26 = 26;
 const int output27 = 27;
 int led2 = 2;
+
+String output26State;
+String output27State;
 
 // Variable to store the HTTP request
 String header;
@@ -66,8 +69,7 @@ void loop() {
 
   //  Read Sensor
     analogRead(potPin);
-    Serial.println(potPin);
-
+    //Serial.println(potPin);
 
 
   if (client) {                             // If a new client connects,
@@ -145,7 +147,8 @@ void loop() {
             } 
             
             // Display Current Moisture Reading
-            client.println("<p>Moisture Sensor Reading " + potPin + " </p>")
+            client.println("<p>Moisture Sensor Reading  </p>");
+            client.println(potValue);
             
             // PUMP START and STOP
             if (pumpstate == 0) {
@@ -198,5 +201,5 @@ void loop() {
     Serial.println("");
   }
 
-  delay(100);
+  delay(2000);
 }
