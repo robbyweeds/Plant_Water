@@ -1,10 +1,19 @@
 #include <arduino.h>
-#include <arduino.h>
 #include <WiFi.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 
 // Potentiometer is connected to GPIO 34
 const int potPin = 34;
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET  -1
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
 
 
 int pumpstate = 0;
@@ -29,7 +38,7 @@ String output27State;
 String header;
 
 // variable for storing the potentiometer value
-int potValue =0;
+int potValue = 0;
 
 // Pump Relay Pin
 int pumpRelayPin = 23;
@@ -37,6 +46,60 @@ int pumpRelayPin = 23;
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
+    Serial.println("SCANNER VALUE");
+    Serial.println("\nI2C Scanner");
+  byte error, address;
+  int nDevices;
+  Serial.println("Scanning...");
+  nDevices = 0;
+  for(address = 1; address < 127; address++ ) {
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+    if (error == 0) {
+      Serial.print("I2C device found at address 0x");
+      if (address<16) {
+        Serial.print("0");
+      }
+      Serial.println(address,HEX);
+      nDevices++;
+    }
+    else if (error==4) {
+      Serial.print("Unknow error at address 0x");
+      if (address<16) {
+        Serial.print("0");
+      }
+      Serial.println(address,HEX);
+    }    
+  }
+  if (nDevices == 0) {
+    Serial.println("No I2C devices found\n");
+  }
+  else {
+    Serial.println("done\n");
+  }
+  delay(5000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //  Initialize pump run relay
     pinMode(pumpRelayPin, OUTPUT);
@@ -48,6 +111,11 @@ void setup() {
 // Set outputs to LOW
   digitalWrite(output26, LOW);
   digitalWrite(output27, LOW);
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
 
 // Connect to Wi-Fi network with SSID and password
   Serial.print("Setting AP (Access Point)…");
@@ -72,14 +140,25 @@ void loop() {
     potValue = analogRead(potPin);
     Serial.println("value: " + potValue);
 
+  display.clearDisplay();
+
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
+  // Display static text
+  display.println("value: " + potValue);
+  display.display(); 
+
 
   if (client) {                             // If a new client connects,
-    Serial.println("New Client.");          // print a message out in the serial port
+
+    Serial.println(potValue);
+    // Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
+        // Serial.write(c);                    // print it out the serial monitor
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
