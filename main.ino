@@ -46,56 +46,6 @@ int pumpRelayPin = 23;
 
 void setup() {
   Serial.begin(115200);
-  Wire.begin();
-    Serial.println("SCANNER VALUE");
-    Serial.println("\nI2C Scanner");
-  byte error, address;
-  int nDevices;
-  Serial.println("Scanning...");
-  nDevices = 0;
-  for(address = 1; address < 127; address++ ) {
-    Wire.beginTransmission(address);
-    error = Wire.endTransmission();
-    if (error == 0) {
-      Serial.print("I2C device found at address 0x");
-      if (address<16) {
-        Serial.print("0");
-      }
-      Serial.println(address,HEX);
-      nDevices++;
-    }
-    else if (error==4) {
-      Serial.print("Unknow error at address 0x");
-      if (address<16) {
-        Serial.print("0");
-      }
-      Serial.println(address,HEX);
-    }    
-  }
-  if (nDevices == 0) {
-    Serial.println("No I2C devices found\n");
-  }
-  else {
-    Serial.println("done\n");
-  }
-  delay(5000);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -115,6 +65,8 @@ void setup() {
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
     Serial.println(F("SSD1306 allocation failed"));
     for(;;);
+  } else {
+    Serial.println("Connected");
   }
 
 // Connect to Wi-Fi network with SSID and password
@@ -136,9 +88,19 @@ void setup() {
 void loop() {
   WiFiClient client = server.available();   // Listen for incoming clients
 
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  } else {
+    Serial.println("Connected");
+  }
+
+
   //  Read Sensor
     potValue = analogRead(potPin);
-    Serial.println("value: " + potValue);
+    potValue = map(potValue, 1000 , 3500, 0, 100);
+    Serial.println("value: " );
+    Serial.println(potValue);
 
   display.clearDisplay();
 
@@ -146,7 +108,8 @@ void loop() {
   display.setTextColor(WHITE);
   display.setCursor(0, 10);
   // Display static text
-  display.println("value: " + potValue);
+  display.println("value: ");
+  display.println(potValue);
   display.display(); 
 
 
@@ -210,12 +173,14 @@ void loop() {
             // CSS to style the on/off buttons 
             // Feel free to change the background-color and font-size attributes to fit your preferences
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
+            client.println(".moistVal { font-size: 30px; border: none; color: blue; padding: 16px 20px;}");
             client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println(".button2 {background-color: #555555;}</style></head>");
             
             // Web Page Heading
-            client.println("<body><h1>ESP32 Moisture Sensor</h1>");
+            client.println("<body><h1>Robby Weeds</h1>");
+            client.println("<h2>ESP32 Moisture Sensor</h2>");
             
             // Display current state, and ON/OFF buttons for GPIO 26  
             client.println("<p>GPIO 26 - State " + output26State + "</p>");
@@ -227,7 +192,7 @@ void loop() {
             } 
             
             // Display Current Moisture Reading
-            client.println("<p>Moisture Sensor Reading  </p>");
+            client.println("<p class=\"moistVal\">Moisture Sensor Reading  </p>");
             client.println(potValue);
             
             // PUMP START and STOP
