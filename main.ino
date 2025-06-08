@@ -6,7 +6,7 @@
 
 
 // Potentiometer is connected to GPIO 34
-const int potPin = 34;
+const int moistSensor = 34;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -38,7 +38,7 @@ String output27State;
 String header;
 
 // variable for storing the potentiometer value
-int potValue = 0;
+int moistValue = 0;
 
 // Pump Relay Pin
 int pumpRelayPin = 23;
@@ -97,10 +97,10 @@ void loop() {
 
 
   //  Read Sensor
-    potValue = analogRead(potPin);
-    potValue = map(potValue, 1000 , 3500, 0, 100);
+    moistValue = analogRead(moistSensor);
+    moistValue = map(moistValue, 1000 , 3500, 0, 100);
     Serial.println("value: " );
-    Serial.println(potValue);
+    Serial.println(moistValue);
 
   display.clearDisplay();
 
@@ -109,13 +109,13 @@ void loop() {
   display.setCursor(0, 10);
   // Display static text
   display.println("value: ");
-  display.println(potValue);
+  display.println(moistValue);
   display.display(); 
 
 
   if (client) {                             // If a new client connects,
 
-    Serial.println(potValue);
+    Serial.println(moistValue);
     // Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
