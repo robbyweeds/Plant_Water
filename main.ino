@@ -1,4 +1,5 @@
 #include <arduino.h>
+
 #include <WiFi.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -97,17 +98,34 @@ void loop() {
 
 
   //  Read Sensor
-    moistValue = analogRead(moistSensor);
-    moistValue = map(moistValue, 1000 , 3500, 0, 100);
-    Serial.println("value: " );
-    Serial.println(moistValue);
+  moistValue = analogRead(moistSensor);
+  moistValue = map(moistValue, 1000 , 3500, 0, 100);
+
+  Serial.println("Moist Value : ");
+  Serial.println(moistValue);
+
+  // if(moistValue < 50)  {
+  //   digitalWrite(pumpRelayPin, HIGH);
+
+  //   display.clearDisplay();
+
+  //   display.setTextSize(1);
+  //   display.setTextColor(WHITE);
+  //   display.setCursor(0, 10);
+  //   display.println("value: ");
+  //   display.println(moistValue);
+  //   display.println("PUMP RUNNNING!!!");
+  //   display.display(); 
+
+  //   sleep(2000);
+  // }
+
 
   display.clearDisplay();
 
   display.setTextSize(1);
   display.setTextColor(WHITE);
   display.setCursor(0, 10);
-  // Display static text
   display.println("value: ");
   display.println(moistValue);
   display.display(); 
@@ -193,7 +211,7 @@ void loop() {
             
             // Display Current Moisture Reading
             client.println("<p class=\"moistVal\">Moisture Sensor Reading  </p>");
-            client.println(potValue);
+            client.println(moistValue);
             
             // PUMP START and STOP
             if (pumpstate == 0) {
@@ -248,3 +266,4 @@ void loop() {
 
   delay(500);
 }
+
