@@ -1,5 +1,6 @@
 #include <arduino.h>
 
+
 #include <WiFi.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -99,26 +100,28 @@ void loop() {
 
   //  Read Sensor
   moistValue = analogRead(moistSensor);
-  moistValue = map(moistValue, 1000 , 3500, 0, 100);
+  //moistValue = map(moistValue, 1000 , 3500, 0, 100);
 
   Serial.println("Moist Value : ");
   Serial.println(moistValue);
 
-  // if(moistValue < 50)  {
-  //   digitalWrite(pumpRelayPin, HIGH);
 
-  //   display.clearDisplay();
 
-  //   display.setTextSize(1);
-  //   display.setTextColor(WHITE);
-  //   display.setCursor(0, 10);
-  //   display.println("value: ");
-  //   display.println(moistValue);
-  //   display.println("PUMP RUNNNING!!!");
-  //   display.display(); 
+  if(moistValue < 50 && pumpAuto == 1)  {
+    digitalWrite(pumpRelayPin, HIGH);
 
-  //   sleep(2000);
-  // }
+    display.clearDisplay();
+
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(0, 10);
+    display.println("value: ");
+    display.println(moistValue);
+    display.println("PUMP RUNNNING!!!");
+    display.display(); 
+
+    sleep(2000);
+  }
 
 
   display.clearDisplay();
@@ -172,12 +175,12 @@ void loop() {
                 Serial.println("Pump Off");
                 pumpstate = 0;
                 digitalWrite(pumpRelayPin, LOW);
-            // } else if (header.indexOf("GET /pumpset/1") >= 0) {
-            //     Serial.println("Pump set to AUTO");
-            //     pumpAuto = 1;
-            // } else if (header.indexOf("GET /pumpset/0") >= 0) {
-            //     Serial.println("Pump AUTO disengaged");
-            //     pumpAuto = 0;
+            } else if (header.indexOf("GET /pumpset/1") >= 0) {
+                Serial.println("Pump set to AUTO");
+                pumpAuto = 1;
+            } else if (header.indexOf("GET /pumpset/0") >= 0) {
+                Serial.println("Pump AUTO disengaged");
+                pumpAuto = 0;
             } else if (header.indexOf("GET /27/off") >= 0) {
               Serial.println("GPIO 27 off");
               output27State = "off";
@@ -203,11 +206,11 @@ void loop() {
             // Display current state, and ON/OFF buttons for GPIO 26  
             client.println("<p>GPIO 26 - State " + output26State + "</p>");
             // If the output26State is off, it displays the ON button       
-            if (output26State=="off") {
-              client.println("<p><a href=\"/26/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/26/off\"><button class=\"button button2\">OFF</button></a></p>");
-            } 
+            // if (output26State=="off") {
+            //   client.println("<p><a href=\"/26/on\"><button class=\"button\">ON</button></a></p>");
+            // } else {
+            //   client.println("<p><a href=\"/26/off\"><button class=\"button button2\">OFF</button></a></p>");
+            // } 
             
             // Display Current Moisture Reading
             client.println("<p class=\"moistVal\">Moisture Sensor Reading  </p>");
@@ -221,27 +224,29 @@ void loop() {
             }
 
             // Set to Pump AUTO
-            // if (pumpAuto == 0) {
-            //     client.println("<p><a href=\"/pumpset/1\"><button class=\"button\">Set to AUTO</button></a></p>");
-            // } else if (pumpAuto == 1 && potPin > 1600) {
-            //     client.println("<p>Pump on AUTO and RUNNING</p>"); 
-            //     client.println("<p><a href=\"/pumpset/0\"><button class=\"button\">Turn Off AUTO</button></a></p>"); 
-            // } else if (pumpAuto == 1 && potPin <= 1600) {
-            //     client.println("<p>Pump on AUTO and OFF</p>"); 
-            //     client.println("<p><a href=\"/pumpset/0\"><button class=\"button\">Turn Off AUTO</button></a></p>"); 
-            // } else {
-            //    client.println("<p><a href=\"/pumpset/0\"><button class=\"button\">Turn Off AUTO</button></a></p>"); 
-            // }
+            if (pumpAuto == 0) {
+                client.println("<p><a href=\"/pumpset/1\"><button class=\"button\">Set to AUTO</button></a></p>");
+            } else if (pumpAuto == 1 && pumpstate == 1) {
+                client.println("<p>Pump on AUTO and RUNNING</p>"); 
+                client.println("<p><a href=\"/pumpset/0\"><button class=\"button\">Turn Off AUTO</button></a></p>"); 
+            } else if (pumpAuto == 1) {
+                client.println("<p>Pump on AUTO and OFF</p>"); 
+                client.println("<p><a href=\"/pumpset/0\"><button class=\"button\">Turn Off AUTO</button></a></p>"); 
+            } else {
+               client.println("<p><a href=\"/pumpset/0\"><button class=\"button\">Turn Off AUTO</button></a></p>"); 
+            }
 
                
-            // Display current state, and ON/OFF buttons for GPIO 27  
-            client.println("<p>GPIO 27 - State " + output27State + "</p>");
-            // If the output27State is off, it displays the ON button       
-            if (output27State=="off") {
-              client.println("<p><a href=\"/27/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/27/off\"><button class=\"button button2\">OFF</button></a></p>");
-            }
+            // // Display current state, and ON/OFF buttons for GPIO 27  
+            // client.println("<p>GPIO 27 - State " + output27State + "</p>");
+            // // If the output27State is off, it displays the ON button       
+            // if (output27State=="off") {
+            //   client.println("<p><a href=\"/27/on\"><button class=\"button\">ON</button></a></p>");
+            // } else {
+            //   client.println("<p><a href=\"/27/off\"><button class=\"button button2\">OFF</button></a></p>");
+            // }
+
+
             client.println("</body></html>");
             
             // The HTTP response ends with another blank line
