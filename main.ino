@@ -22,7 +22,7 @@ int pumpstate = 0;
 int pumpAuto = 0;
 
 // Replace with your network credentials
-const String ssid     = "ESP32-Access-Point";
+const String ssid     = "Robby Weeds - Cacti";
 const String password = "123456789";
 
 // Set web server port number to 80
@@ -54,8 +54,8 @@ void setup() {
 
 
 //  Initialize pump run relay
-    pinMode(pumpRelayPin, OUTPUT);
-    digitalWrite(pumpRelayPin, LOW);
+  pinMode(pumpRelayPin, OUTPUT);
+  digitalWrite(pumpRelayPin, LOW);
 
 // Initialize the output variables as outputs
   pinMode(output26, OUTPUT);
@@ -100,7 +100,7 @@ void loop() {
 
   //  Read Sensor
   moistValue = analogRead(moistSensor);
-  //moistValue = map(moistValue, 1000 , 3500, 0, 100);
+  moistValue = map(moistValue, 1000 , 3500, 0, 100);
 
   Serial.println("Moist Value : ");
   Serial.println(moistValue);
@@ -171,6 +171,9 @@ void loop() {
                 Serial.println("Pump Start");
                 pumpstate = 1;
                 digitalWrite(pumpRelayPin, HIGH);
+                delay(4000);
+                digitalWrite(pumpRelayPin, LOW);
+                pumpstate = 0;
             } else if (header.indexOf("GET /pump/0") >= 0) {
                 Serial.println("Pump Off");
                 pumpstate = 0;
